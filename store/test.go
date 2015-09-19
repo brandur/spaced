@@ -3,7 +3,7 @@ package store
 import (
 	"testing"
 
-	"github.com/brandur/spaced"
+	"github.com/brandur/spaced/model"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -27,7 +27,7 @@ func EmptyGet(t *testing.T, st Store) {
 }
 
 func PutAndGet(t *testing.T, st Store) {
-	card := &spaced.Card{ID: "my-id"}
+	card := &model.Card{ID: "my-id"}
 
 	err := st.PutCard(card)
 	assert.Nil(t, err)

@@ -7,10 +7,11 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/brandur/spaced"
 	"github.com/brandur/spaced/middleware"
+	"github.com/brandur/spaced/store/memstore"
 	"github.com/codegangsta/negroni"
 	"github.com/heroku/rollrus"
-	"github.com/phyber/negroni-gzip/gzip"
 	"github.com/joeshaw/envdecode"
+	"github.com/phyber/negroni-gzip/gzip"
 	"gopkg.in/tylerb/graceful.v1"
 )
 
@@ -22,7 +23,12 @@ func main() {
 
 	initLog(conf.ForceTTY, conf.Source, conf.RollbarToken)
 
-	server, err := spaced.NewServer()
+	st, err := memstore.NewMemstore()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	server, err := spaced.NewServer(st)
 	if err != nil {
 		log.Fatal(err)
 	}

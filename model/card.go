@@ -1,4 +1,4 @@
-package spaced
+package model
 
 // Card (as in "flash card") represents a combination of a question and answer
 // which will be used for learning. It also includes a unique identifier so
