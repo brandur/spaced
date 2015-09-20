@@ -8,6 +8,8 @@ import (
 	"github.com/gorilla/mux"
 )
 
+// Builds a master router that handles all application handlers that make up
+// the API.
 func BuildRouter(st store.Store) *mux.Router {
 	r := mux.NewRouter()
 	r.NotFoundHandler = &NotFoundHandler{}
@@ -17,11 +19,12 @@ func BuildRouter(st store.Store) *mux.Router {
 	return r
 }
 
+// NotFoundHandler writes a 404 to a response using the standard error
+// convention.
 type NotFoundHandler struct {
 }
 
-// Writes a 404 to the response. Used as a default route so that 404 messages
-// match everywhere.
+// Writes a 404 to a response.
 func (h *NotFoundHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	apiErr := errors.NotFoundEndpoint
 	apiErr.WriteHTTP(w)
