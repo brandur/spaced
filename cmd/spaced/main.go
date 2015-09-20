@@ -1,12 +1,12 @@
 package main
 
 import (
-	"net/http"
 	"time"
 
 	log "github.com/Sirupsen/logrus"
-	"github.com/brandur/spaced"
+	"github.com/brandur/spaced/endpoint"
 	"github.com/brandur/spaced/middleware"
+	"github.com/brandur/spaced/store"
 	"github.com/brandur/spaced/store/memstore"
 	"github.com/codegangsta/negroni"
 	"github.com/heroku/rollrus"
@@ -23,22 +23,10 @@ func main() {
 
 	initLog(conf.ForceTTY, conf.Source, conf.RollbarToken)
 
-	st, err := memstore.NewMemstore()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	server, err := spaced.NewServer(st)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	// note that the "/" is special and handles all paths
-	mux := http.NewServeMux()
-	mux.Handle("/", server)
+	st := initStore(conf.DatabaseURL)
 
 	stack := buildMiddlewareStack(conf)
-	stack.UseHandler(mux)
+	stack.UseHandler(endpoint.BuildRouter(st))
 
 	log.WithFields(log.Fields{
 		"port": conf.Port,
@@ -55,6 +43,10 @@ func main() {
 // which will hand off more granular configuration structs to the various
 // modules that they instantiate.
 type Conf struct {
+	// Postgres database URL. If not specified, we default to an in-memory
+	// store.
+	DatabaseURL string `env:"DATABASE_URL"`
+
 	ForceTTY               bool          `env:"FORCE_TTY,default=false"`
 	GracefulRestartTimeout time.Duration `env:"GRACEFUL_RESTART_TIMEOUT,default=10s"`
 	Port                   string        `env:"PORT,required"`
@@ -87,6 +79,8 @@ func buildMiddlewareStack(conf *Conf) *negroni.Negroni {
 	return stack
 }
 
+// Initializes program logging. Configures errors to go to Rollbar if a token
+// was specified.
 func initLog(forceTTY bool, environment, rollbarToken string) {
 	log.SetFormatter(&log.TextFormatter{
 		ForceColors: forceTTY,
@@ -100,4 +94,19 @@ func initLog(forceTTY bool, environment, rollbarToken string) {
 			"environment": environment,
 		}).Infof("Initialized Rollbar tracking with environment %v", environment)
 	}
+}
+
+// Initializes a store for program information. If a database URL was given, a
+// Postgres store is initialized, otherwise an in-memory store is used.
+func initStore(databaseURL string) store.Store {
+	if databaseURL == "" {
+		st, err := memstore.NewMemstore()
+		if err != nil {
+			log.Fatal(err)
+		}
+		return st
+	}
+
+	log.Fatal("Postgres adapter not yet implemented")
+	return nil
 }

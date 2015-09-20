@@ -3,6 +3,7 @@ package spaced
 import (
 	"net/http"
 
+	"github.com/brandur/spaced/errors"
 	"github.com/brandur/spaced/store"
 )
 
@@ -18,5 +19,14 @@ func NewServer(st store.Store) (*Server, error) {
 }
 
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("hello."))
+	switch r.Method {
+	case "PUT":
+		
+	default:
+		goto missing
+	}
+
+missing:
+	apiErr := errors.NotFoundEndpoint
+	apiErr.WriteHTTP(w)
 }

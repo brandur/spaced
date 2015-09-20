@@ -12,6 +12,18 @@ var (
 		Message:    "Our apologies, but something has gone wrong internally. Please contact support if this problem persists.",
 		StatusCode: 500,
 	}
+
+	NotFoundEndpoint = APIError{
+		ID:         "not_found",
+		Message:    "That API endpoint could not be found. Did you specify the right HTTP verb (e.g. GET, PUT, etc.).",
+		StatusCode: 404,
+	}
+
+	NotFoundRecord = APIError{
+		ID:         "not_found",
+		Message:    "That record could not be found.",
+		StatusCode: 404,
+	}
 )
 
 type APIError struct {

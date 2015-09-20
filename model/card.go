@@ -5,11 +5,11 @@ package model
 // that it can be referenced by other entities.
 type Card struct {
 	// Answer to the card's question.
-	Answer string
+	Answer string `json:"answer"`
 
 	// Unique identifier of the card.
-	ID string
+	ID string `json:"id"`
 
 	// Challenge question posed on the card.
-	Question string
+	Question string `json:"question"`
 }
